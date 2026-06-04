@@ -1,0 +1,42 @@
+import type { Request, Response } from 'express'
+import { z } from 'zod'
+import { AuthService } from './auth.service.js';
+
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6)
+})
+const registerSchema = loginSchema.extend({
+    name: z.string().min(2)
+})
+
+export class AuthController {
+    constructor(
+        private authService = new AuthService()
+    ) {}
+    register = async (req: Request, res: Response) => {
+        try {
+            const body = registerSchema.safeParse(req.body);
+            if (!body.success) return res.status(400).json({ message: 'Check the fields.' });
+
+            const result = await this.authService.postRegister(body.data);
+
+            res.status(201).json(result);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message || 'Internal server error' });
+        }
+    }
+
+    login = async (req: Request, res: Response) => {
+        try {
+            const body = loginSchema.safeParse(req.body);
+            if (!body.success) return res.status(400).json({ message: 'Check the fields.' });
+
+            const result = await this.authService.login(body.data);
+
+            res.status(200).json(result);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message || 'Internal server error' });
+        }
+    }
+}
