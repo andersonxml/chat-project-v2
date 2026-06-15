@@ -18,8 +18,7 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
     if (!token) return res.status(401).json({ message: 'No authorization' });
 
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-        req.user = payload;
+        req.user = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
         next();
     } catch (error) {
         return res.status(401).json({ message: 'No authorization' });
@@ -27,21 +26,6 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
 }
 
 export const authAdminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'No authorization header provided' });
-    const token = authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'No authorization' });
-
-    try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-        req.user = payload;
-        const decodedToken = jwt.decode(token) as JWTPayload;
-        if (decodedToken.role !== 'ADMIN') {
-            return res.status(403).json({ message: 'Forbidden' });
-        } 
-
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: 'No authorization' });
-    }
+    if(req.user?.role.toLowerCase() !== 'admin') return res.status(401).json({ message: 'No authorization'});
+    next();
 }
