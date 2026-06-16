@@ -50,7 +50,7 @@ export class AuthService {
     
             const accessToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '15m' });
     
-            const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '9h' });
+            const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '9h' });
             const hashRefreshToken = await bcrypt.hash(RefreshToken, 10);
             const date = new Date()
             const expiresAt = new Date(Date.now() + 9 * 60 * 60 * 1000)
