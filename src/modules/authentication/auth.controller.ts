@@ -34,6 +34,13 @@ export class AuthController {
 
             const result = await this.authService.login(body.data);
 
+            res.cookie('refreshToken', result.RefreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 9 * 60 * 60 * 1000
+            });
+
             res.status(200).json(result);
         } catch (error: any) {
             res.status(500).json({ message: error.message || 'Internal server error' });
@@ -47,6 +54,17 @@ export class AuthController {
             const result = await this.authService.logout({ id: id });
 
             res.status(200).json(result);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message || 'Internal server error' });
+        }
+    }
+
+    refresh = async (req: Request, res: Response) => {
+        try {
+            const id = req.params.id;
+            const result = await this.authService.refresh({id: 3});
+        
+            res.status(200).json(result)
         } catch (error: any) {
             res.status(500).json({ message: error.message || 'Internal server error' });
         }

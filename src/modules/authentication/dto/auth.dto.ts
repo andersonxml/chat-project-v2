@@ -11,3 +11,6 @@ export interface LogoutDTO {
     id: number;
     tokens?: string | null
 }
+export interface RefreshDTO {
+    id: number;
+}
