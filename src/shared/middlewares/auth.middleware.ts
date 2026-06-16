@@ -29,3 +29,13 @@ export const authAdminMiddleware = (req: AuthenticatedRequest, res: Response, ne
     if(req.user?.role.toLowerCase() !== 'admin') return res.status(401).json({ message: 'No authorization'});
     next();
 }
+
+export const logoutMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    if(!id) return res.status(401).json({ message: 'Verify the params'})
+    
+    if(!req.user?.sub) return res.status(401).json({ message: 'User not logged'})
+    
+    if(Number(req.user?.sub) != Number(id)) return res.status(401).json({ message: 'No Authorization'})
+    next()
+}

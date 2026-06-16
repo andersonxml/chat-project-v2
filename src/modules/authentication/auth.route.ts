@@ -1,13 +1,14 @@
-import { authAdminMiddleware, authMiddleware } from '../../shared/middlewares/auth.middleware.js';
+import { authAdminMiddleware, authMiddleware, logoutMiddleware } from '../../shared/middlewares/auth.middleware.js';
 import {AuthController} from './auth.controller.js';
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 
 const authController = new AuthController();
 export const authRouter = Router();
 
 authRouter.post('/register', authMiddleware, authAdminMiddleware, authController.register);
 authRouter.post('/login', authController.login);
+authRouter.post('/logout/:id', authMiddleware, logoutMiddleware, authController.logout);
 
-// authRouter.get('/protected', authAdminMiddleware, (req: Request, res) => {
+// authRouter.get('/protected/:id', authMiddleware, logoutMiddleware, (req: Request, res: Response) => {
 //     res.json({ message: 'This is a protected route' });
 // });
