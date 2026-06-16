@@ -51,9 +51,9 @@ export class AuthService {
 
         const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '9h' });
         const hashRefreshToken = await bcrypt.hash(RefreshToken, 10);
-
+        const date = new Date()
         const expiresAt = new Date(Date.now() + 9 * 60 * 60 * 1000)
-
+        
         const addRefreshTokenDatabase = await prisma.refreshTokens.upsert({
             where: {
                 user_id: userExists.id
