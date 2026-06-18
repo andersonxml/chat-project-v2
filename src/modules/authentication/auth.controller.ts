@@ -28,7 +28,7 @@ export class AuthController {
     }
 
     login = async (req: Request, res: Response) => {
-        try {
+        try {          
             const body = loginSchema.safeParse(req.body);
             if (!body.success) return res.status(400).json({ message: 'Check the fields.' });
 
@@ -36,14 +36,18 @@ export class AuthController {
 
             res.cookie('refreshToken', result.RefreshToken, {
                 httpOnly: true,
-                secure: true,
-                sameSite: 'strict',
+                secure: false,
+                sameSite: 'lax',
+                domain: 'localhost',
                 maxAge: 9 * 60 * 60 * 1000
             });
 
-            res.status(200).json(result);
+            res.status(200).json({
+                user: result.user,
+                accessToken: result.accessToken
+            });
         } catch (error: any) {
-            res.status(500).json({ message: error.message || 'Internal server error' });
+            res.status(500).json({ message: error || 'Internal server error' });
         }
     }
 

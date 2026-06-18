@@ -12,7 +12,7 @@ interface AuthenticatedRequest extends Request {
 
 export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'No authorization header provided' });
+    if (!authHeader) return res.status(400).json({ message: 'No authorization header provided' });
 
     const token = authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'No authorization' });
@@ -32,7 +32,7 @@ export const authAdminMiddleware = (req: AuthenticatedRequest, res: Response, ne
 
 export const logoutMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    if (!id) return res.status(401).json({ message: 'Verify the params' })
+    if (!id) return res.status(400).json({ message: 'Verify the params' })
 
     if (!req.user?.sub) return res.status(401).json({ message: 'User not logged' })
 
@@ -42,11 +42,11 @@ export const logoutMiddleware = (req: AuthenticatedRequest, res: Response, next:
 
 export const refreshMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const token = req.cookies;
-    console.log(token.refreshToken);
+    const token2 = req.headers;
     if (!token) return res.status(401).json({ message: 'No authorization' });
     try {
         jwt.verify(token.refreshToken, process.env.JWT_REFRESH_SECRET!)
-        
+
         next()
     } catch (error) {
         return res.status(401).json({ message: 'No authorization' });

@@ -47,14 +47,14 @@ export class AuthService {
         const password = await bcrypt.compare(data.password, userExists.password);
         if (!password) throw new Error('Invalid email or password');
 
-        const accessToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '15m' });
+        const accessToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '1m' });//15m
 
         const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '9h' });
         // const hashRefreshToken = await bcrypt.hash(RefreshToken, 10);
         const date = new Date()
         const expiresAt = new Date(Date.now() + 9 * 60 * 60 * 1000)
 
-        const addRefreshTokenDatabase = await prisma.refreshTokens.upsert({
+        await prisma.refreshTokens.upsert({
             where: {
                 user_id: userExists.id
             },
@@ -105,6 +105,12 @@ export class AuthService {
         });
         
         if (!user) throw new Error('Invalid user');
+
+        const getRefreshTokenUser = await prisma.refreshTokens.findUnique({
+            where: {
+                user_id: data.id
+            }
+        })
 
         const accessToken = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '15m' });
         
