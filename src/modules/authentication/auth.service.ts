@@ -49,7 +49,7 @@ export class AuthService {
 
         const accessToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_SECRET!, { expiresIn: '1m' });//15m
 
-        const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '9h' });
+        const RefreshToken = jwt.sign({ sub: userExists.id, role: userExists.role }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '2m' });//8h
         // const hashRefreshToken = await bcrypt.hash(RefreshToken, 10);
         const date = new Date()
         const expiresAt = new Date(Date.now() + 9 * 60 * 60 * 1000)
@@ -74,7 +74,8 @@ export class AuthService {
             user: {
                 id: userExists.id,
                 name: userExists.name,
-                email: userExists.email
+                email: userExists.email,
+                role: userExists.role,
             },
             accessToken,
             RefreshToken
@@ -105,14 +106,18 @@ export class AuthService {
         });
         
         if (!user) throw new Error('Invalid user');
-
+ 
         const getRefreshTokenUser = await prisma.refreshTokens.findUnique({
             where: {
                 user_id: data.id
             }
         })
-
-        const accessToken = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '15m' });
+        if(!getRefreshTokenUser) throw new Error('Refresh token not found.')
+        
+        const verify = jwt.verify(getRefreshTokenUser.tokens, process.env.JWT_REFRESH_SECRET!);
+        if(!verify) throw new Error('Refresh token invalid');
+        
+        const accessToken = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1m' });
         
         return accessToken;
     }

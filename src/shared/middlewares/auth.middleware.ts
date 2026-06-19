@@ -42,7 +42,6 @@ export const logoutMiddleware = (req: AuthenticatedRequest, res: Response, next:
 
 export const refreshMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const token = req.cookies;
-    const token2 = req.headers;
     if (!token) return res.status(401).json({ message: 'No authorization' });
     try {
         jwt.verify(token.refreshToken, process.env.JWT_REFRESH_SECRET!)
