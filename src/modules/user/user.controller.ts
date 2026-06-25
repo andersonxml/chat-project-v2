@@ -29,7 +29,7 @@ export class UserController {
         try {
             const body = editUserSchema.safeParse(req.body);
             if (!body.success) return res.status(400).json({ message: 'Check the fields.' })
-            
+
             const result = await this.userService.editUser(body.data);
 
             res.status(200).json(result);
@@ -45,6 +45,22 @@ export class UserController {
             const result = await this.userService.deleteUser(String(email));
 
             res.status(200).json(result);
+        } catch (error: any) {
+            res.status(400).json({ message: error.message });
+        }
+    }
+    me = async (req: Request, res: Response) => {
+        try {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) return res.status(400).json({ message: 'No authorization header provided' });
+
+            const token = authHeader.split(' ')[1];
+            if (!token) return res.status(401).json({ message: 'No authorization' });
+
+            const result = await this.userService.getMe(token);
+            // console.log(result);
+            
+            res.status(200).json(result)
         } catch (error: any) {
             res.status(400).json({ message: error.message });
         }

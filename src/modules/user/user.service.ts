@@ -2,6 +2,7 @@ import type { Role } from "../../generated/prisma/enums.js";
 import { prisma } from "../../shared/database/prisma.js";
 import type { EditDTO } from "./dto/user.dto.js";
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 export class UserService {
     async getAllUsers() {
@@ -59,5 +60,20 @@ export class UserService {
                 email: deletedUser.email,
             }
         };
+    }
+
+    async getMe(token: string) {
+
+        const decoded = jwt.decode(token)
+
+        const findUser = await prisma.user.findUnique({
+            where: {
+                id: Number(decoded!.sub)
+            },
+            omit: {
+                password: true
+            }
+        })
+        return findUser
     }
 }

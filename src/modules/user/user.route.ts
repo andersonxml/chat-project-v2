@@ -8,3 +8,4 @@ const userController = new UserController();
 userRouter.get("/", authMiddleware, userController.users);
 userRouter.put("/", authAdminMiddleware, userController.edit);
 userRouter.delete("/:email", authAdminMiddleware, userController.delete);
+userRouter.get("/me", authMiddleware, userController.me);
