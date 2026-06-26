@@ -7,7 +7,7 @@ export const authRouter = Router();
 
 authRouter.post('/register', authMiddleware, authAdminMiddleware, authController.register);
 authRouter.post('/login', authController.login);
-authRouter.post('/refresh/:id', refreshMiddleware ,authController.refresh)
+authRouter.post('/refresh', refreshMiddleware ,authController.refresh)
 authRouter.post('/logout/:id', authMiddleware, logoutMiddleware, authController.logout);
 
 // authRouter.get('/protected/:id', authMiddleware, logoutMiddleware, (req: Request, res: Response) => {

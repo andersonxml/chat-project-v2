@@ -1,13 +1,15 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { AuthService } from './auth.service.js';
+import jwt from 'jsonwebtoken'
 
 const loginSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6)
 })
 const registerSchema = loginSchema.extend({
-    name: z.string().min(2)
+    name: z.string().min(2),
+    role: z.enum(['USER', 'SAC', 'ADMIN'])
 })
 
 export class AuthController {
@@ -65,8 +67,9 @@ export class AuthController {
 
     refresh = async (req: Request, res: Response) => {
         try {
-            const id = req.params.id;
-            const result = await this.authService.refresh({id: 3});
+            const token = req.cookies;
+            const decoded = jwt.decode(token.refreshToken)
+            const result = await this.authService.refresh({id: Number(decoded?.sub)});
         
             res.status(200).json(result)
         } catch (error: any) {
