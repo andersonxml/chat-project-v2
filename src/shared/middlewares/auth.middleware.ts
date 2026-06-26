@@ -31,18 +31,22 @@ export const authAdminMiddleware = (req: AuthenticatedRequest, res: Response, ne
 }
 
 export const logoutMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    if (!id) return res.status(400).json({ message: 'Verify the params' })
+    const token = req.cookies;
+    if (!token) return res.status(401).json({ message: 'No authorization' });
+    
+    try {
+        jwt.verify(token.refreshToken, process.env.JWT_REFRESH_SECRET!)
 
-    if (!req.user?.sub) return res.status(401).json({ message: 'User not logged' })
-
-    if (Number(req.user?.sub) != Number(id)) return res.status(401).json({ message: 'No Authorization' })
-    next()
+        next()
+    } catch (error) {
+        return res.status(401).json({ message: 'No authorization' });
+    }
 }
 
 export const refreshMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const token = req.cookies;
     if (!token) return res.status(401).json({ message: 'No authorization' });
+    
     try {
         jwt.verify(token.refreshToken, process.env.JWT_REFRESH_SECRET!)
 

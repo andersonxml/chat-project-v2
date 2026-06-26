@@ -58,8 +58,7 @@ export class UserController {
             if (!token) return res.status(401).json({ message: 'No authorization' });
 
             const result = await this.userService.getMe(token);
-            // console.log(result);
-            
+
             res.status(200).json(result)
         } catch (error: any) {
             res.status(400).json({ message: error.message });

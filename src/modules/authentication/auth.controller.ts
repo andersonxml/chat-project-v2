@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { AuthService } from './auth.service.js';
+import jwt from 'jsonwebtoken';
 
 const loginSchema = z.object({
     email: z.string().email(),
@@ -28,7 +29,7 @@ export class AuthController {
     }
 
     login = async (req: Request, res: Response) => {
-        try {          
+        try {
             const body = loginSchema.safeParse(req.body);
             if (!body.success) return res.status(400).json({ message: 'Check the fields.' });
 
@@ -53,9 +54,11 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         try {
-            const id = Number(req.params.id);
-            if (!id) return res.status(400).json({ message: 'Check the fields.' });
-            const result = await this.authService.logout({ id: id });
+            const token = req.cookies; 
+
+            const decoded = jwt.decode(token.refreshToken)
+            if (!token) return res.status(400).json({ message: 'Check the fields.' });
+            const result = await this.authService.logout({ id: Number(decoded?.sub) });
 
             res.status(200).json(result);
         } catch (error: any) {
@@ -65,9 +68,11 @@ export class AuthController {
 
     refresh = async (req: Request, res: Response) => {
         try {
-            const id = req.params.id;
-            const result = await this.authService.refresh({id: 3});
-        
+            const token = req.cookies; 
+            const decoded = jwt.decode(token.refreshToken)
+            
+            const result = await this.authService.refresh({ id: Number(decoded?.sub) });
+
             res.status(200).json(result)
         } catch (error: any) {
             res.status(500).json({ message: error.message || 'Internal server error' });

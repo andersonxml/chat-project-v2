@@ -7,8 +7,8 @@ export const authRouter = Router();
 
 authRouter.post('/register', authMiddleware, authAdminMiddleware, authController.register);
 authRouter.post('/login', authController.login);
-authRouter.post('/refresh/:id', refreshMiddleware ,authController.refresh)
-authRouter.post('/logout/:id', authMiddleware, logoutMiddleware, authController.logout);
+authRouter.post('/refresh', refreshMiddleware ,authController.refresh)
+authRouter.post('/logout', logoutMiddleware, authController.logout);
 
 // authRouter.get('/protected/:id', authMiddleware, logoutMiddleware, (req: Request, res: Response) => {
 //     res.json({ message: 'This is a protected route' });
