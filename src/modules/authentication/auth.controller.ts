@@ -8,7 +8,8 @@ const loginSchema = z.object({
     password: z.string().min(6)
 })
 const registerSchema = loginSchema.extend({
-    name: z.string().min(2)
+    name: z.string().min(2),
+    role: z.enum(['USER', 'SAC', 'ADMIN'])
 })
 
 export class AuthController {

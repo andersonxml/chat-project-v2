@@ -5,6 +5,7 @@ export interface LoginDTO {
 
 export interface RegisterDTO extends LoginDTO {
     name: string;
+    role: 'USER' | 'SAC' | 'ADMIN',
 }
 
 export interface LogoutDTO {
